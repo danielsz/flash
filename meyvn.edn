@@ -7,9 +7,6 @@
  {:uberjar
   {:enabled false,
    :main-class "main.core",
-   :remote-repository
-   {:id "ssh-repository",
-    :url "scpexe://user@domain:/home/.m2/repository"},
    :excludes
    {:artifacts ["org.clojure:google-closure-library"],
     :filters
@@ -18,9 +15,7 @@
      "META-INF/*.DSA"
      "META-INF/*.RSA"]}},
   :jar
-  {:enabled true,
-   :remote-repository {:id "meyvn"
-                       :url "https://nexus.tuppu.net/repository/meyvn/"}}},
+  {:enabled true}},
  :cljs
  {:enabled false,
   :compiler-opts
@@ -79,4 +74,6 @@
     :infer-externs true},
    :tools-deps-alias :figwheel}},
  :graalvm {:enabled false, :with-https false},
+ :distribution-management {:id "meyvn"
+                           :url "https://nexus.tuppu.net/repository/meyvn/"}
  :profiles {:enabled false}}
