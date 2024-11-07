@@ -74,6 +74,6 @@
     :infer-externs true},
    :tools-deps-alias :figwheel}},
  :graalvm {:enabled false, :with-https false},
- :distribution-management {:id "sapiens"
-                           :url "https://nexus.tuppu.net/repository/sapiens/"}
+ :distribution-management {:id "reposilite"
+                           :url "https://reposilite.tuppu.net/sapiens"}
  :profiles {:enabled false}}
