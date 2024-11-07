@@ -3,7 +3,7 @@
 
 (def flash-route
   ["/flash" {:get (fn [{session :session :as request}]
-                    (if-let [flash (:flash session)]                      
+                    (if-let [flash (:flash session)]
                       (let [session (dissoc session :flash)]
                         (-> (pr-str flash)
                            response

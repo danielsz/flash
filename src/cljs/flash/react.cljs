@@ -1,6 +1,6 @@
 (ns flash.react
   (:require [react :as react]
-            [cljs.reader :refer [read-string]]
+            [clojure.edn :refer [read-string]]
             [cljs-utils.react.hooks :refer [useLens]])
   (:require-macros [cljs-utils.compilers.hicada :refer [html]])
   (:import [goog.net XhrIo]))
@@ -8,21 +8,24 @@
 (defonce state (atom {}))
 
 (defn widget [props]
-  (let [{timeout :timeout } (js->clj props :keywordize-keys true)
+  (let [{:keys [timeout checkOnLoad] :or {checkOnLoad false}} (js->clj props :keywordize-keys true)
         flash (useLens state :flash)
+        check #(.send XhrIo "/flash" (fn [e] (let [payload (read-string (.getResponseText (.-target e)))]
+                                              (when (seq payload)
+                                                (swap! state assoc :flash payload)))))
         types {:success {:class "alert-success" :prefix "Well done!"} 
                :info {:class "alert-info" :prefix "Info!"}
                :warning {:class "alert-warning" :prefix "Sorry!"}
                :danger {:class "alert-danger" :prefix "Oh no!"}}]
     (react/useEffect (fn [] (let [id (js/setTimeout #(swap! state assoc :flash {}) (* timeout 1000))]
                              (fn [] (js/clearTimeout id)))) #js [flash])
-    (when (seq flash)
-      (html [:div {:id "flash"
+    (react/useEffect (fn [] (when checkOnLoad (check))
+                       (fn [] (.log js/console "checking flash" checkOnLoad))) #js [])
+    (html (if (seq flash)
+            [:div {:id "flash"
                    :className (str "alert fade in " (:class ((:level flash) types)))}
-             [:strong (:prefix ((:level flash) types))]
-             (str " " (:message flash))]))))
+             [:strong (:prefix ((:level flash) types))
+              (str " " (:message flash))]]
+            [:div ""]))))
 
-(defn check []
-  (.send XhrIo "/flash" (fn [e] (let [payload (read-string (.getResponseText (.-target e)))]                                 
-                                 (when (seq payload)
-                                   (swap! state assoc :flash payload))))))
+
