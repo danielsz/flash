@@ -8,7 +8,7 @@
 (defonce state (atom {}))
 
 (defn widget [props]
-  (let [{:keys [timeout checkOnLoad] :or {checkOnLoad false}} (js->clj props :keywordize-keys true)
+  (let [{:keys [timeout checkOnLoad] :or {checkOnLoad false timeout 3}} (js->clj props :keywordize-keys true)
         flash (useLens state :flash)
         check #(.send XhrIo "/flash" (fn [e] (let [payload (read-string (.getResponseText (.-target e)))]
                                               (when (seq payload)
@@ -20,7 +20,7 @@
     (react/useEffect (fn [] (let [id (js/setTimeout #(swap! state assoc :flash {}) (* timeout 1000))]
                              (fn [] (js/clearTimeout id)))) #js [flash])
     (react/useEffect (fn [] (when checkOnLoad (check))
-                       (fn [] (.log js/console "checking flash" checkOnLoad))) #js [])
+                       (fn [] (println "flash widget cleanup, check on load" checkOnLoad))) #js [])
     (html (if (seq flash)
             [:div {:id "flash"
                    :className (str "alert fade in " (:class ((:level flash) types)))}
